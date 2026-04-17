@@ -63,10 +63,15 @@ Sin embargo aunque estos textos existen, en la práctica los agentes obligados a
 Hemos seleccionado diferentes imágenes dentro de la colonia narvarte, en ella se muestran los problemas reales que las personas a diario deben soportar. En el primer punto hemos de detectar cómo las autoridades omiten las faltas que el reglamento de transito, en muchas ocaciones siendo complice de las faltas administrativas. Las calles viven y deben ser mantenidas y saneadas, por ello muchas otras imágenes demuestran cómo la falta de ello provoca espacios que son peligrosos para personas con debilidad visual, adultos mayores, personas con problemas de movilidad y todo aquel que no tenga las capacidades físicas para superar los obstaculos. 
 
 
-<video width="600" controls>
+<video width="600" autoplay loop muted playsinline>
   <source src="images/blogs/doctorado/p1/Artículo 30.mp4" type="video/mp4">
   Tu navegador no soporta video.
 </video>
+
+## Opiniones
+
+
+`<embed src="images/blogs/doctorado/p1/Perfil sociodemográfico.pdf" type="application/pdf" width="100%" height="600px" />`
 
 
 # Fuentes de cosulta.
