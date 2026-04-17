@@ -46,3 +46,13 @@ La función cdf de una variable aleatoria discreta es continua por partes por la
 - No negatividad: $P(A) >= 0$ para todo evento $A$.
 - Normalización: $P(\Omega) = 1$
 - Uniones disjuntas: para todos los eventos disjuntos $A_i$,  $P(A_1 \cup \cdots) = P(A_i) + \cdots$. 
+
+## Independicia
+De forma matemática, la condición necesaria y suficiente para mostrar independencia entre dos variables aleatorias X,Y es la siguiente
+
+$$
+P(X,Y) = P(X)P(Y)
+$$
+
+Dos variables aleatorias no están correlacionadas si 
+$$

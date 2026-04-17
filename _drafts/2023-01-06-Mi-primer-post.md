@@ -7,3 +7,4 @@ feature_image: images/blogs/misc/p1-qro-trash.jpeg
 tags: [miscelanea, opiniones]
 ---
 proximamente...
+<!--more-->
