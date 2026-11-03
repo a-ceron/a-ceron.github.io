@@ -1,0 +1,124 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const posts = (await getCollection('blog'))
+	.filter((post) => !post.data.draft)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+
+<!doctype html>
+<html lang="es">
+	<head>
+		<BaseHead title={`Blog | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.page-heading {
+				margin-bottom: 2rem;
+			}
+			.page-heading p {
+				max-width: 42rem;
+				color: rgb(var(--gray));
+			}
+			.post-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+				gap: 1.5rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+			.post-card {
+				overflow: hidden;
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				background: var(--surface);
+				box-shadow: 0 2px 8px rgba(23, 52, 48, 0.04);
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+			.post-card:hover {
+				transform: translateY(-4px);
+				box-shadow: var(--box-shadow);
+			}
+			.post-card a {
+				display: flex;
+				height: 100%;
+				flex-direction: column;
+				color: inherit;
+				text-decoration: none;
+			}
+			.post-card img {
+				width: 100%;
+				aspect-ratio: 16 / 9;
+				object-fit: cover;
+				border-radius: 0;
+			}
+			.post-content {
+				padding: 1.25rem;
+			}
+			.post-content h2 {
+				margin: 0 0 0.5rem;
+				font-size: 1.25rem;
+			}
+			.post-content p {
+				margin: 0 0 0.75rem;
+				color: rgb(var(--gray));
+			}
+			.date {
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+			}
+			.empty-state {
+				padding: 1.5rem;
+				border: 1px dashed var(--border);
+				border-radius: 12px;
+				background: var(--surface);
+			}
+			@media (max-width: 720px) {
+				.post-grid { gap: 1rem; }
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-heading">
+				<h1>Blog</h1>
+				<p>Artículos, notas y aprendizajes sobre software, datos y tecnología.</p>
+			</header>
+			{posts.length > 0 ? (
+				<ul class="post-grid">
+					{posts.map((post, index) => (
+						<li class="post-card">
+							<a href={`/blog/${post.id}/`}>
+								{post.data.heroImage && (
+									<Image
+										width={720}
+										height={405}
+										src={post.data.heroImage}
+										alt={post.data.title}
+										loading={index === 0 ? 'eager' : 'lazy'}
+									/>
+								)}
+								<div class="post-content">
+									<h2>{post.data.title}</h2>
+									<p>{post.data.description}</p>
+									<p class="date">
+										<FormattedDate date={post.data.pubDate} />
+									</p>
+								</div>
+							</a>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="empty-state">Aún no hay artículos publicados.</p>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>

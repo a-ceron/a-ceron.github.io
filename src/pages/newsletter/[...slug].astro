@@ -1,0 +1,20 @@
+---
+import { getCollection, render } from 'astro:content';
+import EntryPost from '../../layouts/EntryPost.astro';
+
+export async function getStaticPaths() {
+	const issues = await getCollection('newsletter');
+	return issues.map((issue) => ({
+		params: { slug: issue.id },
+		props: issue,
+	}));
+}
+
+const issue = Astro.props;
+const { Content } = await render(issue);
+const { title, description, pubDate, updatedDate, heroImage } = issue.data;
+---
+
+<EntryPost title={title} description={description} pubDate={pubDate} updatedDate={updatedDate} heroImage={heroImage}>
+	<Content />
+</EntryPost>
