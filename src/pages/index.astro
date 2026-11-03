@@ -1,0 +1,426 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import NewsletterFeed from '../components/NewsletterFeed.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog'))
+	.filter((post) => !post.data.draft)
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const featuredPost = posts[0];
+const recentPosts = posts.slice(1);
+const projects = (await getCollection('projects')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<html lang="es">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		
+		<main class="container">
+			<!-- HERO / FEATURED POST -->
+			{featuredPost && (
+				<section class="hero-featured">
+					<a href={`/blog/${featuredPost.id}`} class="featured-card">
+						<div class="featured-image">
+							{featuredPost.data.heroImage ? (
+								<Image
+									width={960}
+									height={480}
+									src={featuredPost.data.heroImage}
+									alt={featuredPost.data.title}
+								/>
+							) : (
+								<div class="placeholder-img" />
+							)}
+						</div>
+						<div class="featured-content">
+							<span class="badge">Destacado</span>
+							<h2>{featuredPost.data.title}</h2>
+							<p class="description">{featuredPost.data.description}</p>
+							<div class="meta">
+								<FormattedDate date={featuredPost.data.pubDate} />
+							</div>
+						</div>
+					</a>
+				</section>
+			)}
+
+			<!-- CARRUSEL DE PROYECTOS -->
+			<section class="section-block">
+				<div class="section-header">
+					<h3>Proyectos Recientes</h3>
+					{projects.length > 0 && <span class="scroll-hint">Desliza &rarr;</span>}
+				</div>
+				{projects.length > 0 ? (
+					<div class="carousel-container">
+					{projects.slice(0, 6).map((project) => (
+						<article class="project-card">
+							<div class="project-body">
+								<h4>{project.data.title}</h4>
+								<p>{project.data.description}</p>
+								<div class="tags">
+									{project.data.tags.map((tag) => (
+										<span class="tag">{tag}</span>
+									))}
+								</div>
+							</div>
+							<a href={`/projects/${project.id}/`} class="project-link">
+								Ver proyecto &rarr;
+							</a>
+							<a
+								href={project.data.repositoryUrl}
+								class="project-link"
+								target="_blank"
+								rel="noreferrer"
+							>
+								Ver en GitHub ↗
+							</a>
+						</article>
+					))}
+					</div>
+				) : (
+					<p class="empty-state">
+						Aún no hay proyectos publicados. <a href="/projects">Explora la sección de proyectos</a>.
+					</p>
+				)}
+			</section>
+
+			<!-- MATRIZ DE ÚLTIMOS BLOGS -->
+			<section class="section-block">
+				<div class="section-header">
+					<h3>Últimas Publicaciones</h3>
+				</div>
+				<div class="posts-grid">
+					{recentPosts.map((post) => (
+						<article class="post-card">
+							<a href={`/blog/${post.id}`}>
+								<div class="card-image">
+									{post.data.heroImage ? (
+										<Image
+											width={600}
+											height={300}
+											src={post.data.heroImage}
+											alt={post.data.title}
+										/>
+									) : (
+										<div class="placeholder-img" />
+									)}
+								</div>
+								<div class="card-content">
+									<p class="date">
+										<FormattedDate date={post.data.pubDate} />
+									</p>
+									<h4>{post.data.title}</h4>
+									{post.data.description && (
+										<p class="excerpt">{post.data.description}</p>
+									)}
+								</div>
+							</a>
+						</article>
+					))}
+				</div>
+			</section>
+
+			<!-- NEWSLETTER SECTION -->
+			<section class="newsletter-section">
+				<NewsletterFeed
+					title="Mantente al día"
+					description="Lee nuevas publicaciones aquí o síguelas desde tu lector RSS, sin configurar servicios de correo."
+				/>
+			</section>
+		</main>
+
+		<Footer />
+	</body>
+</html>
+
+<style>
+	:root {
+		--max-width: 1100px;
+		--radius-lg: 16px;
+		--radius-md: 10px;
+		--color-bg-subtle: var(--surface-subtle);
+		--color-border: var(--border);
+		--color-primary: var(--accent);
+		--color-text: rgb(var(--black));
+		--color-text-muted: rgb(var(--gray));
+	}
+
+	.container {
+		max-width: var(--max-width);
+		margin: 0 auto;
+		padding: 3rem 1.5rem;
+	}
+
+	.section-block {
+		margin-top: 4rem;
+	}
+
+	.section-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		margin-bottom: 1.5rem;
+	}
+
+	.section-header h3 {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--color-text);
+		margin: 0;
+	}
+
+	.scroll-hint {
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+	}
+
+	/* HERO / FEATURED */
+	.hero-featured {
+		margin-bottom: 3rem;
+	}
+
+	.featured-card {
+		display: grid;
+		grid-template-columns: 1fr;
+		background: var(--color-bg-subtle);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		overflow: hidden;
+		text-decoration: none;
+		color: inherit;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.featured-card:hover {
+		transform: translateY(-3px);
+		box-shadow: var(--box-shadow);
+	}
+
+	@media (min-width: 768px) {
+		.featured-card {
+			grid-template-columns: 1.2fr 1fr;
+		}
+	}
+
+	.featured-image img, .placeholder-img {
+		width: 100%;
+		height: clamp(230px, 30vw, 390px);
+		object-fit: cover;
+		border-radius: 0;
+	}
+
+	.placeholder-img {
+		background: linear-gradient(135deg, #dcebe5 0%, #c3d9cf 100%);
+	}
+
+	.featured-content {
+		padding: 2rem;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.badge {
+		align-self: flex-start;
+		background: var(--color-primary);
+		color: white;
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.25rem 0.75rem;
+		border-radius: 999px;
+		margin-bottom: 1rem;
+		text-transform: uppercase;
+	}
+
+	.featured-content h2 {
+		font-size: 1.75rem;
+		margin: 0 0 0.75rem 0;
+		line-height: 1.25;
+	}
+
+	.featured-content .description {
+		color: var(--color-text-muted);
+		font-size: 1rem;
+		line-height: 1.5;
+		margin-bottom: 1.5rem;
+	}
+
+	/* CARRUSEL PROYECTOS */
+	.carousel-container {
+		display: flex;
+		gap: 1.25rem;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		padding-bottom: 1rem;
+		scrollbar-width: thin;
+	}
+
+	.project-card {
+		flex: 0 0 280px;
+		scroll-snap-align: start;
+		background: var(--surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		padding: 1.5rem;
+		box-shadow: 0 2px 8px rgba(23, 52, 48, 0.04);
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.project-card:hover {
+		transform: translateY(-3px);
+		box-shadow: var(--box-shadow);
+	}
+
+	@media (min-width: 640px) {
+		.project-card {
+			flex: 0 0 320px;
+		}
+	}
+
+	.project-body h4 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.15rem;
+	}
+
+	.project-body p {
+		font-size: 0.9rem;
+		color: var(--color-text-muted);
+		margin-bottom: 1rem;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.tag {
+		font-size: 0.75rem;
+		background: var(--surface-subtle);
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
+		color: var(--accent-dark);
+	}
+
+	.project-link {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--color-primary);
+		text-decoration: none;
+	}
+
+	/* MATRIZ DE POSTS */
+	.posts-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.75rem;
+	}
+
+	@media (min-width: 640px) {
+		.posts-grid {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.posts-grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+
+	.post-card {
+		background: var(--surface);
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-md);
+		overflow: hidden;
+		box-shadow: 0 2px 8px rgba(23, 52, 48, 0.04);
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.post-card:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--box-shadow);
+	}
+
+	.post-card a {
+		text-decoration: none;
+		color: inherit;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+	}
+
+	.card-image img, .card-image .placeholder-img {
+		width: 100%;
+		height: 180px;
+		object-fit: cover;
+		border-radius: 0;
+	}
+
+	.card-content {
+		padding: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+	}
+
+	.card-content .date {
+		font-size: 0.8rem;
+		color: var(--color-text-muted);
+		margin-bottom: 0.5rem;
+	}
+
+	.card-content h4 {
+		margin: 0 0 0.5rem 0;
+		font-size: 1.1rem;
+		line-height: 1.3;
+	}
+
+	.card-content .excerpt {
+		font-size: 0.875rem;
+		color: var(--color-text-muted);
+		line-height: 1.4;
+		margin: 0;
+	}
+
+	.newsletter-section {
+		margin-top: 5rem;
+	}
+
+	.empty-state {
+		padding: 1.25rem 1.5rem;
+		border: 1px dashed var(--color-border);
+		border-radius: var(--radius-md);
+		background: var(--surface);
+		color: var(--color-text-muted);
+	}
+
+	@media (max-width: 720px) {
+		.container {
+			padding: 2rem 1rem;
+		}
+
+		.featured-content {
+			padding: 1.5rem;
+		}
+
+		.section-block {
+			margin-top: 2.75rem;
+		}
+	}
+</style>

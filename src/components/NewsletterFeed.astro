@@ -1,0 +1,56 @@
+---
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = 'Sigue el newsletter',
+	description = 'Lee las publicaciones aquí o síguelas desde tu lector RSS.',
+} = Astro.props;
+---
+
+<aside class="newsletter-box">
+	<div class="newsletter-content">
+		<h3>{title}</h3>
+		<p>{description}</p>
+	</div>
+	<a class="rss-link" href="/newsletter/rss.xml">
+		Seguir el feed RSS <span aria-hidden="true">→</span>
+	</a>
+</aside>
+
+<style>
+	.newsletter-box {
+		margin: 3rem 0;
+		padding: 2rem;
+		border: 1px solid var(--border);
+		border-radius: 0.75rem;
+		background: var(--surface);
+	}
+
+	.newsletter-content h3 {
+		margin: 0 0 0.5rem;
+		font-size: 1.25rem;
+	}
+
+	.newsletter-content p {
+		margin: 0 0 1.5rem;
+		color: rgb(var(--gray));
+		font-size: 0.95rem;
+	}
+
+	.rss-link {
+		display: inline-block;
+		padding: 0.65rem 1rem;
+		border-radius: 0.375rem;
+		background: var(--accent);
+		color: #fff;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.rss-link:hover {
+		background: var(--accent-dark);
+	}
+</style>

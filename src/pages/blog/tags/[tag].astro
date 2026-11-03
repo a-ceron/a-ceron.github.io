@@ -1,0 +1,114 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FormattedDate from '../../../components/FormattedDate.astro';
+
+export async function getStaticPaths() {
+	const allPosts = await getCollection('blog');
+	const publishedPosts = allPosts.filter((post) => !post.data.draft);
+	const tags = new Map<string, { label: string; posts: typeof publishedPosts }>();
+
+	for (const post of publishedPosts) {
+		for (const label of post.data.tags) {
+			const slug = label.toLowerCase();
+			let entry = tags.get(slug);
+			if (!entry) {
+				entry = { label, posts: [] };
+				tags.set(slug, entry);
+			}
+			entry.posts.push(post);
+		}
+	}
+
+	return [...tags].map(([slug, entry]) => ({
+		params: { tag: slug },
+		props: {
+			...entry,
+			posts: entry.posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+		},
+	}));
+}
+
+const { label, posts } = Astro.props;
+---
+
+<BaseLayout title={`Artículos sobre ${label}`} description={`Lista de artículos filtrados por la etiqueta ${label}`}>
+	<header class="tag-header">
+		<a href="/blog" class="back-link">&larr; Volver a todos los artículos</a>
+		<h1>Artículos etiquetados con <span class="highlight">#{label}</span></h1>
+	</header>
+
+	<section class="posts-list">
+		{posts.map((post) => (
+			<article class="post-item">
+				<a href={`/blog/${post.id}`}>
+					<h2>{post.data.title}</h2>
+					<p class="date"><FormattedDate date={post.data.pubDate} /></p>
+					{post.data.description && <p class="description">{post.data.description}</p>}
+				</a>
+			</article>
+		))}
+	</section>
+</BaseLayout>
+
+<style>
+	.tag-header {
+		margin-bottom: 2.5rem;
+	}
+
+	.back-link {
+		color: var(--accent);
+		text-decoration: none;
+		font-size: 0.9rem;
+		font-weight: 500;
+	}
+
+	.tag-header h1 {
+		margin-top: 0.5rem;
+		font-size: 2rem;
+	}
+
+	.highlight {
+		color: var(--accent);
+	}
+
+	.posts-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.post-item a {
+		display: block;
+		padding: 1.25rem;
+		border: 1px solid var(--border);
+		border-radius: 12px;
+		background: var(--surface);
+		text-decoration: none;
+		color: inherit;
+		transition: border-color 0.2s ease, transform 0.2s ease;
+	}
+
+	.post-item a:hover {
+		border-color: var(--accent);
+		transform: translateY(-3px);
+		box-shadow: var(--box-shadow);
+	}
+
+	.post-item h2 {
+		margin: 0 0 0.25rem 0;
+		font-size: 1.25rem;
+	}
+
+	.date {
+		font-size: 0.8rem;
+		color: rgb(var(--gray));
+		margin-bottom: 0.5rem;
+	}
+
+	.description {
+		margin: 0;
+		color: rgb(var(--gray-dark));
+		font-size: 0.95rem;
+	}
+</style>

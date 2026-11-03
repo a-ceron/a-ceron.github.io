@@ -1,0 +1,57 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BaseHead from '../components/BaseHead.astro';
+
+const { title, description } = Astro.props;
+---
+
+<html lang="es">
+	<head>
+		<BaseHead title={title} description={description} />
+	</head>
+	<body>
+		<div class="app-layout">
+			<Header />
+			<div class="app-content">
+				<main class="main-wrapper">
+					<slot />
+				</main>
+				<Footer />
+			</div>
+		</div>
+	</body>
+</html>
+
+<style>
+	body {
+		margin: 0;
+		font-family: var(--font-atkinson);
+		background: var(--page-bg);
+		color: rgb(var(--gray-dark));
+	}
+
+	.app-layout {
+		display: block;
+		min-height: 100vh;
+	}
+
+	.app-content {
+		min-height: 100vh;
+		min-width: 0; /* Previene desbordamiento en elementos flex */
+	}
+
+	.main-wrapper {
+		width: 100%;
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: 2rem 1rem 4rem;
+		box-sizing: border-box;
+	}
+
+	@media (min-width: 1024px) {
+		.main-wrapper {
+			padding: 3rem 2rem 5rem;
+		}
+	}
+</style>

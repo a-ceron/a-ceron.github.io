@@ -1,0 +1,193 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+
+const projects = (await getCollection('projects')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const statusLabels = {
+	active: 'En curso',
+	completed: 'Completado',
+	archived: 'Archivado',
+};
+---
+
+<html lang="es">
+	<head>
+		<BaseHead title="Proyectos" description="Proyectos personales y profesionales." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-heading">
+				<p class="eyebrow">Experimentos e ideas en construcción</p>
+				<h1>Proyectos</h1>
+				<p>Una selección de proyectos en los que he trabajado.</p>
+			</header>
+			{projects.length > 0 ? (
+				<ul class="entries">
+					{projects.map((project) => (
+						<li>
+							<div class="entry-card">
+								<a class="entry-link" href={`/projects/${project.id}/`}>
+									{project.data.heroImage && (
+										<Image
+											width={720}
+											height={360}
+											src={project.data.heroImage}
+											alt={project.data.title}
+										/>
+									)}
+									<h2>{project.data.title}</h2>
+									<p>{project.data.description}</p>
+									<div class="entry-meta">
+										<span class={`status status-${project.data.status}`}>
+											{statusLabels[project.data.status]}
+										</span>
+										<FormattedDate date={project.data.pubDate} />
+									</div>
+								</a>
+								<a
+									class="repository-link"
+									href={project.data.repositoryUrl}
+									target="_blank"
+									rel="noreferrer"
+								>
+									Ver en GitHub <span aria-hidden="true">↗</span>
+								</a>
+							</div>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="empty-state">Aún no hay proyectos publicados. Vuelve pronto para ver novedades.</p>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.entries {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+		gap: 2rem;
+		margin: 2rem 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.entries a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.entries li {
+		overflow: hidden;
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		background: var(--surface);
+		box-shadow: 0 2px 8px rgba(23, 52, 48, 0.04);
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.entries li:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--box-shadow);
+	}
+
+	.entry-link {
+		display: block;
+	}
+
+	.entries img {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: 0;
+	}
+
+	.entry-link > :not(img) {
+		margin-right: 1.25rem;
+		margin-left: 1.25rem;
+	}
+
+	.entries li h2 {
+		margin-top: 1rem;
+		font-size: 1.35rem;
+	}
+
+	.entry-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 1.25rem;
+		color: rgb(var(--gray));
+		font-size: 0.85rem;
+	}
+
+	.repository-link {
+		display: inline-block;
+		margin: 0 1.25rem 1.25rem;
+		padding: 0.5rem 0.75rem;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		color: var(--accent-dark) !important;
+		font-size: 0.9rem;
+		font-weight: 700;
+	}
+
+	.status {
+		padding: 0.2rem 0.6rem;
+		border-radius: 999px;
+		background: var(--surface-subtle);
+		color: var(--accent-dark);
+		font-weight: 700;
+	}
+
+	.status-completed {
+		background: #e7f4ec;
+		color: #286744;
+	}
+
+	.status-archived {
+		background: #edf0ef;
+		color: #586763;
+	}
+
+	.page-heading {
+		max-width: 46rem;
+		margin-bottom: 2rem;
+	}
+
+	.page-heading .eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent);
+		font-size: 0.85rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.page-heading h1 {
+		margin-bottom: 0.5rem;
+	}
+
+	.page-heading p:last-child,
+	.entries li p {
+		color: rgb(var(--gray));
+	}
+
+	.empty-state {
+		padding: 1.25rem 1.5rem;
+		border: 1px dashed var(--border);
+		border-radius: 12px;
+		background: var(--surface);
+		color: rgb(var(--gray));
+	}
+</style>

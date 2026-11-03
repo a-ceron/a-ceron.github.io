@@ -1,0 +1,142 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import NewsletterFeed from '../../components/NewsletterFeed.astro';
+
+const issues = (await getCollection('newsletter')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<html lang="es">
+	<head>
+		<BaseHead title="Newsletter" description="Publicaciones del newsletter y feed RSS." />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<header class="page-heading">
+				<p class="eyebrow">Ideas para leer con calma</p>
+				<h1>Newsletter</h1>
+				<p>Notas y publicaciones para leer aquí o seguir desde tu lector RSS.</p>
+			</header>
+			<NewsletterFeed />
+			<a class="rss-link" href="/newsletter/rss.xml">Seguir el feed RSS <span aria-hidden="true">→</span></a>
+			{issues.length > 0 ? (
+				<ul class="entries">
+					{issues.map((issue) => (
+						<li>
+							<a href={`/newsletter/${issue.id}/`}>
+								{issue.data.heroImage && (
+									<Image
+										width={720}
+										height={360}
+										src={issue.data.heroImage}
+										alt={issue.data.title}
+									/>
+								)}
+								<h2>{issue.data.title}</h2>
+								<p>{issue.data.description}</p>
+								<FormattedDate date={issue.data.pubDate} />
+							</a>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="empty-state">Aún no hay publicaciones. Pronto habrá nuevas notas para leer.</p>
+			)}
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	.entries {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+		gap: 2rem;
+		margin: 1.5rem 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.entries a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.entries li {
+		overflow: hidden;
+		border: 1px solid var(--border);
+		border-radius: 14px;
+		background: var(--surface);
+		transition: transform 0.2s ease, box-shadow 0.2s ease;
+	}
+
+	.entries li:hover {
+		transform: translateY(-4px);
+		box-shadow: var(--box-shadow);
+	}
+
+	.entries img {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		object-fit: cover;
+		border-radius: 0;
+	}
+
+	.entries li a > :not(img) {
+		margin-right: 1.25rem;
+		margin-left: 1.25rem;
+	}
+
+	.entries li a > :last-child {
+		margin-bottom: 1.25rem;
+	}
+
+	.page-heading {
+		max-width: 46rem;
+		margin-bottom: 2rem;
+	}
+
+	.page-heading .eyebrow {
+		margin: 0 0 0.5rem;
+		color: var(--accent);
+		font-size: 0.85rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.page-heading h1 {
+		margin-bottom: 0.5rem;
+	}
+
+	.page-heading p:last-child {
+		color: rgb(var(--gray));
+	}
+
+	.rss-link {
+		display: inline-block;
+		padding: 0.55rem 0.9rem;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+		font-size: 0.9rem;
+		font-weight: 600;
+		text-decoration: none;
+	}
+
+	.empty-state {
+		margin-top: 2rem;
+		padding: 1.25rem 1.5rem;
+		border: 1px dashed var(--border);
+		border-radius: 12px;
+		background: var(--surface);
+		color: rgb(var(--gray));
+	}
+</style>

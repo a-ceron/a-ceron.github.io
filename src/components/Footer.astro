@@ -1,0 +1,33 @@
+---
+import { SITE_TITLE } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer>
+	<span>© {year} {SITE_TITLE}</span>
+	<a href="https://github.com/a-ceron" target="_blank" rel="noreferrer">GitHub</a>
+</footer>
+
+<style>
+	footer {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 1.25rem;
+		padding: 1.5rem;
+		border-top: 1px solid var(--border);
+		background: var(--surface);
+		color: rgb(var(--gray));
+		font-size: 0.9rem;
+	}
+
+	footer a {
+		color: var(--accent);
+		text-decoration: none;
+	}
+
+	footer a:hover {
+		color: var(--accent-dark);
+	}
+</style>
